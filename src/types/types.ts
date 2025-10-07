@@ -21,3 +21,7 @@ export interface iFormLayout {
     title?: string;
     forms?: any;
 }
+
+export interface iAdminLayout {
+    children: any
+}

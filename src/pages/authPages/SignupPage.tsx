@@ -82,20 +82,10 @@ const SignupPage = () => {
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-3">
-        <Label htmlFor="phone" className="text-gray-500">Phone</Label>
+        <Label htmlFor="text" className="text-gray-500">Email Address</Label>
         <div className="grid grid-cols-[1fr_auto] gap-2 w-full max-w-xs">
-          <div className="relative">
-            <Input type="tel" id="phone" className="pl-20" />
-            <div className="absolute inset-y-0 left-0 flex items-center">
-              <div className="ml-1 h-[calc(100%-8px)] px-3 bg-gray-200 text-gray-700 rounded-md shadow-sm flex items-center gap-1">
-                <span className="text-sm font-medium"> +91 </span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 opacity-80">
-                  <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
-          </div>
-          <Button size="sm">Verify</Button>
+          <Input type="text" id="phone" placeholder='+91' />
+          <Button size="sm"> Verify </Button>
         </div>
       </div>
 
