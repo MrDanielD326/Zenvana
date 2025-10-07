@@ -27,7 +27,7 @@ const SignupPage = () => {
       <div className="flex flex-col gap-4">
         <Button variant="outline">{googleIcon} Continue with Google</Button>
         <Button variant="outline">{appleIcon} Continue with Apple</Button>
-        <span className="text-sm font-bold">OR</span>
+        <span className="text-sm font-semibold">OR</span>
         <Button onClick={() => setStep(2)} variant="destructive">Continue</Button>
       </div>
     </div>
@@ -46,7 +46,7 @@ const SignupPage = () => {
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1">
-        <Label htmlFor="ownerName" className="text-gray-500">Gym Owner's {required}</Label>
+        <Label htmlFor="ownerName" className="text-gray-500">Gym Owner's First Name {required}</Label>
         <span className="text-gray-500 text-sm">(will have access to all features of the app)</span>
         <Input type="text" id="ownerName" />
       </div>
@@ -84,7 +84,17 @@ const SignupPage = () => {
       <div className="grid w-full max-w-sm items-center gap-3">
         <Label htmlFor="phone" className="text-gray-500">Phone</Label>
         <div className="grid grid-cols-[1fr_auto] gap-2 w-full max-w-xs">
-          <Input type="text" id="phone" />
+          <div className="relative">
+            <Input type="tel" id="phone" className="pl-20" />
+            <div className="absolute inset-y-0 left-0 flex items-center">
+              <div className="ml-1 h-[calc(100%-8px)] px-3 bg-gray-200 text-gray-700 rounded-md shadow-sm flex items-center gap-1">
+                <span className="text-sm font-medium"> +91 </span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 opacity-80">
+                  <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
           <Button size="sm">Verify</Button>
         </div>
       </div>
@@ -111,7 +121,7 @@ const SignupPage = () => {
       <div className="flex items-center justify-center gap-2">
         <Checkbox />
         <span className="text-sm">
-          I agree to the <Button variant="link" size="sm">Privacy Policy.</Button>
+          I agree to the <Button variant="link" size="sm" className="-m-2.5">Privacy Policy.</Button>
         </span>
       </div>
 

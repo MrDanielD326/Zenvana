@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
@@ -33,7 +32,11 @@ const LoginPage = () => {
         </InputOTP>
       </div>
 
-      <Separator />
+      <div className="flex items-center gap-2">
+        <hr className="flex-1" />
+        <span className="text-sm font-semibold"> OR </span>
+        <hr className="flex-1" />
+      </div>
 
       <div className="flex flex-col gap-4">
         <Button variant="outline"> {googleIcon} Continue with Google </Button>
@@ -43,7 +46,7 @@ const LoginPage = () => {
     </div>
   );
 
-  return <AuthLayout image={"backgroundD.svg"} form={<FormLayout title='Login' forms={formContent()}/>} />
+  return <AuthLayout image={"backgroundD.svg"} form={<FormLayout title='Login' forms={formContent()} />} />
 
 }
 
