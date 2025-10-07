@@ -3,6 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './pages/authPages/LandingPage.tsx'
 import LoginPage from './pages/authPages/LoginPage.tsx'
 import SignupPage from './pages/authPages/SignupPage.tsx'
+import LeadManagement from './pages/mainPages/LeadManagement.tsx'
+import CommingSoon from './components/customUI/CommingSoon.tsx'
+
+const comingSoonRoutes = [
+  '/dashboard', '/wellVantageLeads', '/memberManagement',
+  '/membershipManagement', '/attendanceTracking', '/employeeManagement',
+  '/revenueManagement', '/expenseManagementAndProfit', '/workoutManagement'
+]
 
 function App() {
   return (
@@ -11,6 +19,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/leadManagement" element={<LeadManagement />} />
+        {comingSoonRoutes.map((path) => <Route key={path} path={path} element={<CommingSoon />} />)}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
