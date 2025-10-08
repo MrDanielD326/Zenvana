@@ -5,20 +5,27 @@ import { useNavigate } from 'react-router-dom';
 export const LoginSSO = () => {
     const navigate = useNavigate();
 
-    const navLead = () => {
-        navigate('/leadManagement');
-    };
-
     const googleIcon = <img src="buttonGoogle.svg" alt="Google Icon" className="w-4 h-4" />;
 
     return (
-        <SignedOut>
-            <SignInButton>
-                <Button variant="outline" onClick={navLead} className="cursor-pointer">
-                    {googleIcon} Continue with Google
+        <>
+            <SignedOut>
+                <SignInButton mode="modal" forceRedirectUrl="/leadManagement">
+                    <Button variant="outline" className="cursor-pointer">
+                        {googleIcon} Continue with Google
+                    </Button>
+                </SignInButton>
+            </SignedOut>
+            <SignedIn>
+                <Button
+                    variant="outline"
+                    onClick={() => navigate('/leadManagement')}
+                    className="cursor-pointer"
+                >
+                    {googleIcon} Go to Lead Management
                 </Button>
-            </SignInButton>
-        </SignedOut>
+            </SignedIn>
+        </>
     );
 };
 

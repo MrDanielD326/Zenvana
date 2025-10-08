@@ -5,6 +5,7 @@ import LoginPage from './pages/authPages/LoginPage.tsx'
 import SignupPage from './pages/authPages/SignupPage.tsx'
 import LeadManagement from './pages/mainPages/LeadManagement.tsx'
 import { ComingSoon } from './components/customUI/ComingSoon.tsx'
+import ProtectedRoute from './components/auth/ProtectedRoute.tsx'
 
 const comingSoonRoutes = [
   '/dashboard', '/wellVantageLeads', '/memberManagement',
@@ -19,8 +20,16 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/leadManagement" element={<LeadManagement />} />
-        {comingSoonRoutes.map((path) => <Route key={path} path={path} element={<ComingSoon />} />)}
+        <Route path="/leadManagement" element={
+          <ProtectedRoute>
+            <LeadManagement />
+          </ProtectedRoute>
+        } />
+        {comingSoonRoutes.map((path) => <Route key={path} path={path} element={
+          <ProtectedRoute>
+            <ComingSoon />
+          </ProtectedRoute>
+        } />)}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
