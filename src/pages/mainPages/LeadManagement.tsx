@@ -86,7 +86,7 @@ const LeadManagement = () => {
   const [currentTab, setCurrentTab] = useState('basic')
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingLeadId, setEditingLeadId] = useState<string | null>(null)
-  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null)
+
 
   const today = new Date();
   const [date, setDate] = useState<Date | undefined>(today);
@@ -238,12 +238,7 @@ const LeadManagement = () => {
         if (!formData.weight) missingFields.push('Weight')
       }
 
-      setNotification({
-        message: `Please fill in the following required fields: ${missingFields.join(', ')}`,
-        type: 'error'
-      })
-
-      setTimeout(() => setNotification(null), 5000)
+      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`)
     }
   }
 
@@ -287,18 +282,9 @@ const LeadManagement = () => {
       setCompleteLeadsData(prev => [...prev, completeLeadData])
     }
 
-    // Show success notification
-    setNotification({
-      message: isEditMode ? 'Lead updated successfully!' : 'Lead created successfully!',
-      type: 'success'
-    })
-
     // Reset form and go back to table view
     resetForm()
     setShowBasicTabs(false)
-
-    // Clear notification after 3 seconds
-    setTimeout(() => setNotification(null), 3000)
   }
 
   const resetForm = () => {
@@ -454,7 +440,7 @@ const LeadManagement = () => {
             <div className="space-y-4">
               <Tabs value={currentTab} onValueChange={setCurrentTab}>
                 <TabsList className="justify-start gap-10 bg-transparent p-0 rounded-none border-b border-gray-300">
-                  {secondaryTab.map((data, index) => (
+                  {secondaryTab.map((data) => (
                     <TabsTrigger
                       key={data}
                       value={data}
