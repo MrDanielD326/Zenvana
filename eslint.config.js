@@ -18,6 +18,20 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser
+    },
+    rules: {
+      // Allow exporting non-components from UI component files (shadcn/ui pattern)
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true, allowExportNames: ['badgeVariants', 'buttonVariants'] }
+      ]
+    }
+  },
+  {
+    // Special rules for UI components directory
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off'
     }
   }
 ])

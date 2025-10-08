@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Avatar, AvatarFallback } from "../ui/avatar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Badge } from "../ui/badge"
+
 
 export type iLead = {
   id: string
@@ -60,15 +60,40 @@ function Chip({ children }: { children: ReactNode }) {
 
 function InterestBadge({ level }: { level: iLead["interest"] }) {
   const map: Record<iLead["interest"], string> = {
-    Hot: "bg-[#FFDBDB] text-red-700",
-    Warm: "bg-[#FFECCD] text-yellow-700",
-    Cold: "bg-[#C9E8FF] text-blue-700"
+    Hot: "bg-[#FFDBDB] text-red-700 border-red-200",
+    Warm: "bg-[#FFECCD] text-yellow-700 border-yellow-200",
+    Cold: "bg-[#C9E8FF] text-blue-700 border-blue-200"
   }
   const icon = level === "Hot" ? icons.hotIcon : level === "Warm" ? icons.warmIcon : icons.coldIcon
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md ${map[level]}`}>
-      <span> {icon} </span>
+    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md border ${map[level]}`}>
+      <span className="text-sm">{icon}</span>
       {level}
+    </span>
+  )
+}
+
+function FollowUpBadge({ status }: { status: string }) {
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case "New Inquiry":
+        return "text-blue-700 bg-[#BFDBFE] border-blue-200"
+      case "Need Follow Up":
+        return "text-amber-600 bg-[#FDE68A] border-amber-200"
+      case "Engaged":
+        return "text-green-700 bg-[#BBF7D0] border-green-200"
+      case "Converted":
+        return "text-purple-700 bg-[#DDD6FE] border-purple-200"
+      case "Archived":
+        return "text-gray-700 bg-[#CBD5E1] border-gray-200"
+      default:
+        return "text-gray-600 bg-gray-100 border-gray-200"
+    }
+  }
+
+  return (
+    <span className={`inline-flex items-center text-xs font-medium px-3 py-1 rounded-md border ${getStatusStyles(status)}`}>
+      {status}
     </span>
   )
 }
@@ -224,12 +249,15 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
 
   return (
     <div className="w-full">
-      <div className="flex w-full gap-4 items-center">
-        <Input placeholder="Search" className="flex-1 bg-gray-100" value={search} onChange={(e) => { setPage(1); setSearch(e.target.value) }} />
+      <div className={`flex w-full gap-4 items-center ${isMobile ? 'flex-col' : ''}`}>
+        <Input placeholder="Search leads..." className={`${isMobile ? 'w-full' : 'flex-1'} bg-gray-100`} value={search} onChange={(e) => { setPage(1); setSearch(e.target.value) }} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="font-semibold gap-2 bg-gray-100 text-gray-700">
-              Last interaction : {lastAfter ? lastAfter.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "Any"} <ChevronDown size={16} />
+            <Button variant="outline" className={`font-semibold gap-2 bg-gray-100 text-gray-700 ${isMobile ? 'w-full justify-between' : ''}`}>
+              <span className={isMobile ? 'truncate' : ''}>
+                Last interaction : {lastAfter ? lastAfter.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "Any"}
+              </span>
+              <ChevronDown size={16} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -247,8 +275,13 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
               </DropdownMenuItem>
             ))}
             {dynamicDateOptions.length === 0 && data.length > 0 && (
-              <DropdownMenuItem disabled>
+              <DropdownMenuItem disabled className="text-gray-400">
                 No valid dates found
+              </DropdownMenuItem>
+            )}
+            {data.length === 0 && (
+              <DropdownMenuItem disabled className="text-gray-400">
+                No data available
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -257,7 +290,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
 
       <div className="flex flex-wrap gap-3 mt-4">
         {/* Row 1 */}
-        <div className={isMobile ? "w-1/2" : "w-auto"}>
+        <div className={isMobile ? "w-full" : "w-auto"}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div>
@@ -299,7 +332,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
           </DropdownMenu>
         </div>
 
-        <div className={isMobile ? "w-1/2" : "w-auto"}>
+        <div className={isMobile ? "w-full" : "w-auto"}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div>
@@ -315,7 +348,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
                 <DropdownMenuItem
                   key={who}
                   onClick={() => {
-                    setAssignedFilter(who as any)
+                    setAssignedFilter(who as string | "All")
                     setPage(1)
                   }}
                 >
@@ -327,7 +360,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
         </div>
 
         {/* Row 2 */}
-        <div className={isMobile ? "w-1/2" : "w-auto"}>
+        <div className={isMobile ? "w-full" : "w-auto"}>
           <button
             className="w-full px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2"
             onClick={() => {
@@ -340,7 +373,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
           </button>
         </div>
 
-        <div className={isMobile ? "w-1/2" : "w-auto"}>
+        <div className={isMobile ? "w-full" : "w-auto"}>
           <button
             className="w-full px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2"
             onClick={() => {
@@ -438,16 +471,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
                 <TableCell className="text-center truncate"> {lead.assignedTo} </TableCell>
                 <TableCell className="text-center truncate"> {lead.lastInteraction} </TableCell>
                 <TableCell className="text-center">
-                  <Badge
-                    className={`text-xs font-medium px-3 py-1 rounded-md ${lead.followUp === "New Inquiry" ? "text-blue-700 bg-[#BFDBFE]" :
-                      lead.followUp === "Need Follow Up" ? "text-amber-600 bg-[#FDE68A]" :
-                        lead.followUp === "Engaged" ? "text-green-700 bg-[#BBF7D0]" :
-                          lead.followUp === "Converted" ? "text-purple-700 bg-[#DDD6FE]" :
-                            lead.followUp === "Archived" ? "text-gray-700 bg-[#CBD5E1]" : ""
-                      }`}
-                  >
-                    {lead.followUp}
-                  </Badge>
+                  <FollowUpBadge status={lead.followUp} />
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="inline-flex items-center justify-center gap-3 text-gray-600">
@@ -480,7 +504,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }
           {getPageList(safePage, totalPages).map((p, idx) => (
             <PaginationItem key={`${p}-${idx}`}>
               {p === "..." ? <PaginationEllipsis className="size-6" /> : (
-                <PaginationLink size="sm" href="#" isActive={p === safePage} onClick={(e) => { e.preventDefault(); setPage(p as number) }} className={p === safePage ? "bg-green-600 text-white rounded-md px-2 h-6 leading-none text-xs" : "h-7 leading-none text-xs"}>
+                <PaginationLink size="sm" href="#" isActive={p === safePage} onClick={(e) => { e.preventDefault(); setPage(p as number) }} className={p === safePage ? "bg-green-600 text-white hover:bg-green-700 rounded-md px-2 h-6 leading-none text-xs" : "h-7 leading-none text-xs hover:bg-gray-100"}>
                   {p}
                 </PaginationLink>
               )}

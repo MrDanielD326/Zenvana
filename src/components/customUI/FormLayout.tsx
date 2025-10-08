@@ -3,13 +3,14 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import type { FC } from "react";
 import type { iFormLayout } from "@/types/types";
+import { ROUTES } from "@/utils/constants";
 
 const FormLayout: FC<iFormLayout> = ({ title, forms }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const navSignup = () => navigate("/signup");
-    const navLogin = () => navigate("/login");
+    const navSignup = () => navigate(ROUTES.SIGNUP);
+    const navLogin = () => navigate(ROUTES.LOGIN);
 
     return (
         <div className="max-w-md w-full text-center px-6">
@@ -24,7 +25,7 @@ const FormLayout: FC<iFormLayout> = ({ title, forms }) => {
                         >
                             {location.pathname === "/" ? "Welcome to" : title}
                         </span>
-                        {location.pathname === "/" && (
+                        {location.pathname === ROUTES.HOME && (
                             <img
                                 src="/brandTitle.svg"
                                 alt="Brand Title"
@@ -35,7 +36,7 @@ const FormLayout: FC<iFormLayout> = ({ title, forms }) => {
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-8 w-full max-h-[80vh] overflow-y-auto">
-                    {location.pathname === "/" ? (
+                    {location.pathname === ROUTES.HOME ? (
                         <>
                             <Button type="button" className="w-full" onClick={navSignup}>
                                 Gym Owner - Sign Up

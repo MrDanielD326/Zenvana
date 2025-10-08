@@ -14,7 +14,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          clerk: ['@clerk/clerk-react'],
+          ui: ['@radix-ui/react-avatar', '@radix-ui/react-checkbox', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-label', '@radix-ui/react-popover', '@radix-ui/react-separator', '@radix-ui/react-slot', '@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
+          table: ['@tanstack/react-table'],
+          utils: ['chrono-node', 'date-fns', 'clsx', 'class-variance-authority', 'tailwind-merge'],
+        },
       },
     },
   },

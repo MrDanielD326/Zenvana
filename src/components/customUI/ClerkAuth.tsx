@@ -1,6 +1,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/utils/constants';
 
 export const LoginSSO = () => {
     const navigate = useNavigate();
@@ -10,18 +11,14 @@ export const LoginSSO = () => {
     return (
         <>
             <SignedOut>
-                <SignInButton mode="modal" forceRedirectUrl="/leadManagement">
+                <SignInButton mode="modal" forceRedirectUrl={ROUTES.LEAD_MANAGEMENT}>
                     <Button variant="outline" className="cursor-pointer">
                         {googleIcon} Continue with Google
                     </Button>
                 </SignInButton>
             </SignedOut>
             <SignedIn>
-                <Button
-                    variant="outline"
-                    onClick={() => navigate('/leadManagement')}
-                    className="cursor-pointer"
-                >
+                <Button variant="outline" onClick={() => navigate(ROUTES.LEAD_MANAGEMENT)} className="cursor-pointer">
                     {googleIcon} Go to Lead Management
                 </Button>
             </SignedIn>
@@ -34,9 +31,7 @@ export const LogoutSSO = () => {
 
     return (
         <div className="flex items-center gap-3">
-            <SignedIn>
-                <UserButton />
-            </SignedIn>
+            <SignedIn> <UserButton /> </SignedIn>
             <p className="text-sm font-medium text-gray-800 truncate">
                 {isLoaded && user ? user.fullName : 'Loading...'}
             </p>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LogOut } from "lucide-react";
-import { sidebarIcon } from "@/config/siderbarIcons";
+import { sidebarIcon } from "@/config/sidebarIcons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LogoutSSO } from "./ClerkAuth";
@@ -27,7 +27,7 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
       id,
       label,
       path: `/${id}`,
-      icon: sidebarIcon[id as keyof typeof sidebarIcon],
+      icon: sidebarIcon[id as keyof typeof sidebarIcon]
     };
   });
 
@@ -74,7 +74,7 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
 
           {/* User Section */}
           <div className="flex items-center justify-between mt-auto">
-            {!collapsed && ( <LogoutSSO /> )}
+            {!collapsed && (<LogoutSSO />)}
             <Button variant="ghost" size="icon" className="text-gray-500 hover:text-green-700 cursor-pointer" onClick={navLogout}>
               <LogOut />
             </Button>

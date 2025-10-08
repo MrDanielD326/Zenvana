@@ -15,11 +15,11 @@
         "time": ["Morning", "Afternoon", "Evening", "Late evening"],
         "intensity": ["Light", "Moderate", "High"],
         "concerns": ["Diabetes", "Hypertension", "Asthma", "Others (free space)", "None"],
-        "experience": ["Hot", "Warm", "Cold"]
+        "experience": ["Beginner", "Intermediate", "Advanced", "Expert"]
       },
       "statusTabs": {
         "receptionist": ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"],
-        "level": ["Hot", "Warm", "Cold"],
+        "level": ["High", "Medium", "Low"],
         "status": ["Fresh lead", "Contacted once", "Contacted but no recent response", "Actively talking or interested", "Signed up"],
         "packages": ["Gym", "Yoga", "Calisthenics"],
         "pt": ["Yoga + Calisthenics", "Gym + Calisthenics", "Gym + Yoga"],
