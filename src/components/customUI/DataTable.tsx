@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Badge } from "../ui/badge"
 
-type iLead = {
+export type iLead = {
   id: string
   name: string
   interest: "Hot" | "Warm" | "Cold"
@@ -23,6 +23,7 @@ type iLead = {
 type iDataTable = {
   data?: iLead[]
   pageSize?: number
+  onEditLead?: (lead: iLead) => void
 }
 
 const icons = {
@@ -47,26 +48,7 @@ const icons = {
   boxIcon: <Box />
 }
 
-const defaultLeads: iLead[] = (() => {
-  const names = [
-    "Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta",
-    "Olivia Smith", "Liam Johnson", "Emma Müller", "Noah Dubois", "Sofia Rossi",
-    "Hiroshi Tanaka", "Yuna Kim", "Miguel Alvarez", "Isabella Costa", "Fatima Zahra",
-    "Alexander Ivanov", "Aisha Khan", "Chloe Brown", "Luca Bianchi", "Amara Okafor"
-  ]
-  const assignees = ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"]
-  const interests: iLead["interest"][] = ["Hot", "Warm", "Cold"]
-  const follows = ["New Inquiry", "Need Follow Up", "Engaged", "Converted", "Archived"]
-
-  return names.map((name, i) => ({
-    id: String(i + 1),
-    name,
-    interest: interests[i % interests.length],
-    assignedTo: assignees[i % assignees.length],
-    lastInteraction: `${30 - i} June 2025`,
-    followUp: follows[i % follows.length]
-  }))
-})()
+const defaultLeads: iLead[] = []
 
 function Chip({ children }: { children: ReactNode }) {
   return (
@@ -108,7 +90,7 @@ function getPageList(current: number, total: number): (number | "...")[] {
   return pages
 }
 
-export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable) {
+export function DataTableDemo({ data = defaultLeads, pageSize = 10, onEditLead }: iDataTable) {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(0)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -120,12 +102,111 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
 
   const isMobile = useIsMobile()
 
+  // Generate dynamic date options based on actual data
+  const dynamicDateOptions = useMemo(() => {
+    if (!data.length) return []
+
+    // Helper function to parse different date formats
+    const parseFlexibleDate = (dateStr: string): Date | null => {
+      // Try parsing as-is first
+      let date = new Date(dateStr)
+      if (!isNaN(date.getTime())) return date
+
+      // Try parsing common formats like "15 January 2025"
+      const formats = [
+        /(\d{1,2})\s+(\w+)\s+(\d{4})/, // "15 January 2025"
+        /(\w+)\s+(\d{1,2}),?\s+(\d{4})/, // "January 15, 2025" or "January 15 2025"
+      ]
+
+      for (const format of formats) {
+        const match = dateStr.match(format)
+        if (match) {
+          date = new Date(dateStr)
+          if (!isNaN(date.getTime())) return date
+        }
+      }
+
+      return null
+    }
+
+    // Get all unique dates from the data
+    const dates = data
+      .map(lead => parseFlexibleDate(lead.lastInteraction))
+      .filter((date): date is Date => date !== null) // Filter out invalid dates
+      .sort((a, b) => b.getTime() - a.getTime()) // Sort newest first
+
+    // Remove duplicates by converting to date strings and back
+    const uniqueDates = Array.from(
+      new Set(dates.map(date => date.toDateString()))
+    ).map(dateString => new Date(dateString))
+
+    // Generate useful date ranges
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
+    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+
+    const options: { date: Date; label: string }[] = []
+
+    // Add common date ranges if there's data in those ranges
+    const hasDataAfter = (date: Date) => dates.some(d => d >= date)
+
+    if (hasDataAfter(today)) {
+      options.push({ date: today, label: "Today" })
+    }
+    if (hasDataAfter(yesterday) && !hasDataAfter(today)) {
+      options.push({ date: yesterday, label: "Yesterday or later" })
+    }
+    if (hasDataAfter(lastWeek) && !hasDataAfter(yesterday)) {
+      options.push({ date: lastWeek, label: "Last 7 days" })
+    }
+    if (hasDataAfter(lastMonth) && !hasDataAfter(lastWeek)) {
+      options.push({ date: lastMonth, label: "Last 30 days" })
+    }
+
+    // Add up to 3 most recent unique dates that aren't already covered
+    const recentDates = uniqueDates
+      .filter(date => !options.some(opt => opt.date.toDateString() === date.toDateString()))
+      .slice(0, 3)
+      .map(date => ({
+        date,
+        label: date.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        })
+      }))
+
+    const allOptions = [...options, ...recentDates]
+
+    // If no options were generated but we have data, add a fallback
+    if (allOptions.length === 0 && dates.length > 0) {
+      const oldestDate = dates[dates.length - 1]
+      allOptions.push({
+        date: oldestDate,
+        label: oldestDate.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        })
+      })
+    }
+
+    return allOptions
+  }, [data])
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     let out = data.filter((l) => l.name.toLowerCase().includes(q)) // <-- only name
     if (interestFilter.size) out = out.filter((l) => interestFilter.has(l.interest))
     if (assignedFilter !== "All") out = out.filter((l) => l.assignedTo === assignedFilter)
-    if (lastAfter) out = out.filter((l) => new Date(l.lastInteraction) >= lastAfter)
+    if (lastAfter) {
+      out = out.filter((l) => {
+        const leadDate = new Date(l.lastInteraction)
+        return !isNaN(leadDate.getTime()) && leadDate >= lastAfter
+      })
+    }
     if (sortBy) {
       const dir = sortDir === "asc" ? 1 : -1
       out = [...out].sort((a, b) =>
@@ -154,9 +235,22 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Last interaction after</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => { setLastAfter(null); setPage(1) }}>Any</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => { setLastAfter(new Date("2025-06-01")); setPage(1) }}>1 June 2025</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => { setLastAfter(new Date("2025-07-01")); setPage(1) }}>1 July 2025</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => { setLastAfter(new Date("2025-07-26")); setPage(1) }}>26 July 2025</DropdownMenuItem>
+            {dynamicDateOptions.map((option, index) => (
+              <DropdownMenuItem
+                key={index}
+                onClick={() => {
+                  setLastAfter(option.date);
+                  setPage(1)
+                }}
+              >
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+            {dynamicDateOptions.length === 0 && data.length > 0 && (
+              <DropdownMenuItem disabled>
+                No valid dates found
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -332,7 +426,10 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar> <AvatarFallback> {lead.name[0]} </AvatarFallback> </Avatar>
-                    <a className="text-blue-600 hover:underline truncate cursor-pointer">
+                    <a
+                      className="text-blue-600 hover:underline truncate cursor-pointer"
+                      onClick={() => onEditLead?.(lead)}
+                    >
                       {lead.name}
                     </a>
                   </div>
@@ -343,10 +440,10 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                 <TableCell className="text-center">
                   <Badge
                     className={`text-xs font-medium px-3 py-1 rounded-md ${lead.followUp === "New Inquiry" ? "text-blue-700 bg-[#BFDBFE]" :
-                        lead.followUp === "Need Follow Up" ? "text-amber-600 bg-[#FDE68A]" :
-                          lead.followUp === "Engaged" ? "text-green-700 bg-[#BBF7D0]" :
-                            lead.followUp === "Converted" ? "text-purple-700 bg-[#DDD6FE]" :
-                              lead.followUp === "Archived" ? "text-gray-700 bg-[#CBD5E1]" : ""
+                      lead.followUp === "Need Follow Up" ? "text-amber-600 bg-[#FDE68A]" :
+                        lead.followUp === "Engaged" ? "text-green-700 bg-[#BBF7D0]" :
+                          lead.followUp === "Converted" ? "text-purple-700 bg-[#DDD6FE]" :
+                            lead.followUp === "Archived" ? "text-gray-700 bg-[#CBD5E1]" : ""
                       }`}
                   >
                     {lead.followUp}
