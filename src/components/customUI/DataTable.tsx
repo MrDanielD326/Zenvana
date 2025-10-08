@@ -28,16 +28,17 @@ const defaultLeads: iLead[] = (() => {
     "Hiroshi Tanaka", "Yuna Kim", "Miguel Alvarez", "Isabella Costa", "Fatima Zahra",
     "Alexander Ivanov", "Aisha Khan", "Chloe Brown", "Luca Bianchi", "Amara Okafor"
   ]
-
   const assignees = ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"]
   const interests: iLead["interest"][] = ["Hot", "Warm", "Cold"]
+  const follows = ["New Inquiry", "Need Follow Up", "Engaged", "Converted", "Archived"]
+
   return names.map((name, i) => ({
     id: String(i + 1),
     name,
     interest: interests[i % interests.length],
     assignedTo: assignees[i % assignees.length],
-    lastInteraction: `${10 + i} July 2025`,
-    followUp: "Need Follow Up",
+    lastInteraction: `${30 - i} June 2025`,
+    followUp: follows[i % follows.length],
   }))
 })()
 
@@ -122,13 +123,17 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
 
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase()
-    let out = data.filter((l) => [l.name, l.assignedTo, l.interest, l.lastInteraction, l.followUp].join(" ").toLowerCase().includes(q))
+    let out = data.filter((l) => l.name.toLowerCase().includes(q)) // <-- only name
     if (interestFilter.size) out = out.filter((l) => interestFilter.has(l.interest))
     if (assignedFilter !== "All") out = out.filter((l) => l.assignedTo === assignedFilter)
     if (lastAfter) out = out.filter((l) => new Date(l.lastInteraction) >= lastAfter)
     if (sortBy) {
       const dir = sortDir === "asc" ? 1 : -1
-      out = [...out].sort((a, b) => sortBy === "name" ? a.name.localeCompare(b.name) * dir : (new Date(a.lastInteraction).getTime() - new Date(b.lastInteraction).getTime()) * dir)
+      out = [...out].sort((a, b) =>
+        sortBy === "name"
+          ? a.name.localeCompare(b.name) * dir
+          : (new Date(a.lastInteraction).getTime() - new Date(b.lastInteraction).getTime()) * dir
+      )
     }
     return out
   }, [data, search, interestFilter, assignedFilter, lastAfter, sortBy, sortDir])
@@ -333,17 +338,20 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                     </a>
                   </div>
                 </TableCell>
+                <TableCell className="text-center"> <InterestBadge level={lead.interest} /> </TableCell>
+                <TableCell className="text-center truncate" title={lead.assignedTo}> {lead.assignedTo} </TableCell>
+                <TableCell className="text-center truncate" title={lead.lastInteraction}> {lead.lastInteraction} </TableCell>
                 <TableCell className="text-center">
-                  <InterestBadge level={lead.interest} />
-                </TableCell>
-                <TableCell className="text-center truncate" title={lead.assignedTo}>
-                  {lead.assignedTo}
-                </TableCell>
-                <TableCell className="text-center truncate" title={lead.lastInteraction}>
-                  {lead.lastInteraction}
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className="text-amber-600 bg-amber-100 text-xs font-medium px-3 py-1 rounded-md">{lead.followUp}</span>
+                  <Badge
+                    className={`text-xs font-medium px-3 py-1 rounded-md ${lead.followUp === "New Inquiry" ? "text-blue-700 bg-[#BFDBFE]" :
+                        lead.followUp === "Need Follow Up" ? "text-amber-600 bg-[#FDE68A]" :
+                          lead.followUp === "Engaged" ? "text-green-700 bg-[#BBF7D0]" :
+                            lead.followUp === "Converted" ? "text-purple-700 bg-[#DDD6FE]" :
+                              lead.followUp === "Archived" ? "text-gray-700 bg-[#CBD5E1]" : ""
+                      }`}
+                  >
+                    {lead.followUp}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="inline-flex items-center justify-center gap-3 text-gray-600">
