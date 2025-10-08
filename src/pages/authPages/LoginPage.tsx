@@ -5,13 +5,11 @@ import { Input } from '@/components/ui/input'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { Label } from '@/components/ui/label'
 import { useNavigate } from 'react-router-dom'
+import { LoginSSO } from '@/components/customUI/ClerkAuth'
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const navSignup = () => navigate("/signup");
-  const navLead = () => navigate("/leadManagement");
-
-  const googleIcon = <img src="buttonGoogle.svg" alt="Google Icon" className="w-4 h-4" />;
   const appleIcon = <img src="buttonApple.svg" alt="Apple Icon" className="w-4 h-4" />;
 
   const formContent = () => (
@@ -40,7 +38,7 @@ const LoginPage = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <Button variant="outline" onClick={navLead} className="cursor-pointer"> {googleIcon} Continue with Google </Button>
+        <LoginSSO />
         <Button variant="outline"> {appleIcon} Continue with Apple </Button>
         <Button variant="link" onClick={navSignup}> Sign-Up </Button>
       </div>

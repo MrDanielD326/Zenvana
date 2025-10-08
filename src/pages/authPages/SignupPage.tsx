@@ -7,18 +7,17 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
+import { LoginSSO } from '@/components/customUI/ClerkAuth';
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
-  const googleIcon = <img src="buttonGoogle.svg" alt="Google Icon" className="w-4 h-4" />;
   const appleIcon = <img src="buttonApple.svg" alt="Apple Icon" className="w-4 h-4" />;
 
   const required = <span className="text-red-500">*</span>;
 
   const navLogin = () => navigate("/login");
-  const navLead = () => navigate("/leadManagement");
 
   const formContentStep1 = (
     <div className="flex flex-col gap-8">
@@ -26,7 +25,7 @@ const SignupPage = () => {
         Welcome! Manage, Track and Grow your Gym with Wellvantage.
       </span>
       <div className="flex flex-col gap-4">
-        <Button variant="outline" onClick={navLead} className="cursor-pointer">{googleIcon} Continue with Google</Button>
+        <LoginSSO />
         <Button variant="outline">{appleIcon} Continue with Apple</Button>
         <span className="text-sm font-semibold">OR</span>
         <Button onClick={() => setStep(2)} variant="destructive">Continue</Button>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AdminLayout from '@/components/customUI/AdminLayout'
 import { ComingSoonNew } from '@/components/customUI/ComingSoon'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,8 @@ import { Calendar } from '@/components/ui/calendar'
 import { Textarea } from '@/components/ui/textarea'
 import config from '@/config/config.json';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardHeader } from '@/components/ui/card'
 
 const {
   dropdownOptions: {
@@ -34,7 +36,16 @@ interface iRows {
   open: boolean
 }
 
+const Loader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <Skeleton className="h-[600px] w-[1000px] rounded-xl flex items-center justify-center text-xl font-bold">
+      Loading...
+    </Skeleton>
+  </div>
+)
+
 const LeadManagement = () => {
+  const [isLoading, setIsLoading] = useState(true)
   const [showBasicTabs, setShowBasicTabs] = useState(false)
   const [selectedGender, setSelectedGender] = useState<string>("")
   const [selectedWeight, setSelectedWeight] = useState<string>("")
@@ -59,6 +70,11 @@ const LeadManagement = () => {
   const [value, setValue] = useState(formatDate(today));
   const [date, setDate] = useState<Date | undefined>(today);
   const [month, setMonth] = useState<Date | undefined>(today);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 2000)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleAddClick = () => setShowBasicTabs(true)
   const handleUpdateClick = () => setShowBasicTabs(false)
@@ -95,6 +111,7 @@ const LeadManagement = () => {
 
   const commonTabStyle = "px-0 py-2 font-semibold text-foreground bg-transparent border-0 border-b-2 border-transparent rounded-none shadow-none focus:outline-0 focus:ring-0 data-[state=active]:text-green-600 data-[state=active]:border-green-600 data-[state=active]:shadow-none"
 
+  if (isLoading) return <Loader />
   return (
     <AdminLayout
       children={

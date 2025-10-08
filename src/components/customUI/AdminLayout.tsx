@@ -7,18 +7,11 @@ import { ArrowLeft, ArrowRight, LogOut } from "lucide-react";
 import { sidebarIcon } from "@/config/siderbarIcons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { LogoutSSO } from "./ClerkAuth";
 
-const menuDefinitions = [
-  "dashboard",
-  "leadManagement",
-  "wellVantageLeads",
-  "memberManagement",
-  "membershipManagement",
-  "attendanceTracking",
-  "employeeManagement",
-  "revenueManagement",
-  "expenseManagementAndProfit",
-  "workoutManagement",
+const navMenu = [
+  "dashboard", "leadManagement", "wellVantageLeads", "memberManagement", "membershipManagement",
+  "attendanceTracking", "employeeManagement", "revenueManagement", "expenseManagementAndProfit", "workoutManagement"
 ] as const;
 
 const AdminLayout: FC<iAdminLayout> = ({ children }) => {
@@ -27,9 +20,7 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  const navLogout = () => navigate("/");
-
-  const menuItems = menuDefinitions.map((id) => {
+  const menuItems = navMenu.map((id) => {
     let label = id.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
     if (label.includes(" And ")) label = label.replace(" And ", " & ");
     return {
@@ -42,6 +33,8 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
 
   // Default to /leadManagement if root path
   const currentPath = location.pathname === "/" ? "/leadManagement" : location.pathname;
+
+  const navLogout = () => navigate("/");
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-muted/30">
@@ -81,14 +74,7 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
 
           {/* User Section */}
           <div className="flex items-center justify-between mt-auto">
-            {!collapsed && (
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gray-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium"> DS </span>
-                </div>
-                <p className="text-sm font-medium text-gray-800 truncate"> David Smith </p>
-              </div>
-            )}
+            {!collapsed && ( <LogoutSSO /> )}
             <Button variant="ghost" size="icon" className="text-gray-500 hover:text-green-700 cursor-pointer" onClick={navLogout}>
               <LogOut />
             </Button>
@@ -97,9 +83,7 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
       </div>
 
       {/* Mobile Overlay */}
-      {isMobile && !collapsed && (
-        <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setCollapsed(true)} />
-      )}
+      {isMobile && !collapsed && <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setCollapsed(true)} />}
 
       {/* Main Content */}
       <div className="flex-1 -mt-6 p-4 md:p-6 overflow-y-auto h-screen bg-background">
@@ -110,7 +94,7 @@ const AdminLayout: FC<iAdminLayout> = ({ children }) => {
                 {collapsed ? <ArrowRight /> : <ArrowLeft />}
               </Button>
             </TooltipTrigger>
-            <TooltipContent> {collapsed ? "Open Sidebar" : "Close Sidebar"} </TooltipContent>
+            <TooltipContent> {collapsed ? "Open" : "Close"} Sidebar </TooltipContent>
           </Tooltip>
         </div>
         {children}
