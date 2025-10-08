@@ -8,6 +8,9 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { ArrowRightCircle, Box, ChevronDown, X } from "lucide-react"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "../ui/avatar"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Badge } from "../ui/badge"
 
 type iLead = {
   id: string
@@ -25,7 +28,7 @@ const defaultLeads: iLead[] = (() => {
     "Hiroshi Tanaka", "Yuna Kim", "Miguel Alvarez", "Isabella Costa", "Fatima Zahra",
     "Alexander Ivanov", "Aisha Khan", "Chloe Brown", "Luca Bianchi", "Amara Okafor"
   ]
-  
+
   const assignees = ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"]
   const interests: iLead["interest"][] = ["Hot", "Warm", "Cold"]
   return names.map((name, i) => ({
@@ -115,6 +118,8 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
   const [sortDir, setSortDir] = React.useState<"asc" | "desc">("asc")
   const [lastAfter, setLastAfter] = React.useState<Date | null>(null)
 
+  const isMobile = useIsMobile()
+
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase()
     let out = data.filter((l) => [l.name, l.assignedTo, l.interest, l.lastInteraction, l.followUp].join(" ").toLowerCase().includes(q))
@@ -152,54 +157,126 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
         </DropdownMenu>
       </div>
 
-      <div className="flex items-center gap-3 mt-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div><Chip><span className="text-gray-600">Interest Level</span><ChevronDown size={16} /></Chip></div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Filter by interest</DropdownMenuLabel>
-            {(["Hot", "Warm", "Cold"] as const).map((lvl) => (
-              <DropdownMenuCheckboxItem key={lvl} checked={interestFilter.has(lvl)} onCheckedChange={(v) => {
-                setPage(1)
-                setInterestFilter((prev) => {
-                  const next = new Set(prev)
-                  if (v) next.add(lvl); else next.delete(lvl)
-                  return next
-                })
-              }}>{lvl}</DropdownMenuCheckboxItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { setInterestFilter(new Set()); setPage(1) }}>Clear</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div><Chip><span className="text-gray-600">Assigned to</span><ChevronDown size={16} /></Chip></div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Assigned to</DropdownMenuLabel>
-            {(["All", ...Array.from(new Set(data.map((d) => d.assignedTo)))] as string[]).map((who) => (
-              <DropdownMenuItem key={who} onClick={() => { setAssignedFilter(who as any); setPage(1) }}>
-                <span className={who === assignedFilter ? "font-semibold" : ""}>{who}</span>
+      <div className="flex flex-wrap gap-3 mt-4">
+        {/* Row 1 */}
+        <div className={isMobile ? "w-1/2" : "w-auto"}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div>
+                <Chip>
+                  <span className="text-gray-600">Interest Level</span>
+                  <ChevronDown size={16} />
+                </Chip>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Filter by interest</DropdownMenuLabel>
+              {(["Hot", "Warm", "Cold"] as const).map((lvl) => (
+                <DropdownMenuCheckboxItem
+                  key={lvl}
+                  checked={interestFilter.has(lvl)}
+                  onCheckedChange={(v) => {
+                    setPage(1)
+                    setInterestFilter((prev) => {
+                      const next = new Set(prev)
+                      if (v) next.add(lvl)
+                      else next.delete(lvl)
+                      return next
+                    })
+                  }}
+                >
+                  {lvl}
+                </DropdownMenuCheckboxItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  setInterestFilter(new Set())
+                  setPage(1)
+                }}
+              >
+                Clear
               </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-        <button className="px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2 " onClick={() => { setSortBy("createdAt"); setSortDir((d) => d === "asc" ? "desc" : "asc") }}>
-          <span className="text-gray-600 ">Created At</span>
-          <span className="text-gray-400">{sortBy === "createdAt" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
-        </button>
+        <div className={isMobile ? "w-1/2" : "w-auto"}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div>
+                <Chip>
+                  <span className="text-gray-600">Assigned to</span>
+                  <ChevronDown size={16} />
+                </Chip>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Assigned to</DropdownMenuLabel>
+              {(["All", ...Array.from(new Set(data.map((d) => d.assignedTo)))] as string[]).map((who) => (
+                <DropdownMenuItem
+                  key={who}
+                  onClick={() => {
+                    setAssignedFilter(who as any)
+                    setPage(1)
+                  }}
+                >
+                  <span className={who === assignedFilter ? "font-semibold" : ""}>{who}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-        <button className="px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2" onClick={() => { setSortBy("name"); setSortDir((d) => d === "asc" ? "desc" : "asc") }}>
-          <span className="text-gray-600">Name Alphabetical</span>
-          <span className="text-gray-400">{sortBy === "name" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
-        </button>
+        {/* Row 2 */}
+        <div className={isMobile ? "w-1/2" : "w-auto"}>
+          <button
+            className="w-full px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2"
+            onClick={() => {
+              setSortBy("createdAt")
+              setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+            }}
+          >
+            <span className="text-gray-600">Created At</span>
+            <span className="text-gray-400">{sortBy === "createdAt" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
+          </button>
+        </div>
 
+        <div className={isMobile ? "w-1/2" : "w-auto"}>
+          <button
+            className="w-full px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2"
+            onClick={() => {
+              setSortBy("name")
+              setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+            }}
+          >
+            <span className="text-gray-600">Name Alphabetical</span>
+            <span className="text-gray-400">{sortBy === "name" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
+          </button>
+        </div>
+
+        {/* Reset Button */}
         <div className="ml-auto">
-          <Button variant="ghost" size="icon" onClick={() => { setSearch(""); setInterestFilter(new Set()); setAssignedFilter("All"); setSortBy(null); setLastAfter(null); setSelectedIds(new Set()); setPage(1) }}><X size={18} /></Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setSearch("")
+                  setInterestFilter(new Set())
+                  setAssignedFilter("All")
+                  setSortBy(null)
+                  setLastAfter(null)
+                  setSelectedIds(new Set())
+                  setPage(1)
+                }}
+              >
+                <X size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Reset</TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -250,8 +327,8 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <Avatar> <AvatarFallback>{lead.name[0]}</AvatarFallback> </Avatar>
-                    <a className="text-blue-600 hover:underline truncate" href="#" title={lead.name}>
+                    <Avatar> <AvatarFallback> {lead.name[0]} </AvatarFallback> </Avatar>
+                    <a className="text-blue-600 hover:underline truncate" title={lead.name}>
                       {lead.name}
                     </a>
                   </div>
@@ -270,9 +347,15 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="inline-flex items-center justify-center gap-3 text-gray-600">
-                    <span title="WhatsApp" onClick={() => window.alert(`Open WhatsApp for ${lead.name}`)} className="cursor-pointer">{icons.whatappsIcon}</span>
-                    <span title="History" onClick={() => window.alert(`Open history for ${lead.name}`)} className="cursor-pointer">{icons.arrowIcon}</span>
-                    <span title="Options" onClick={() => window.alert(`More options for ${lead.name}`)} className="cursor-pointer">{icons.boxIcon}</span>
+                    <span title="WhatsApp" onClick={() => window.alert(`Open WhatsApp for ${lead.name}`)} className="cursor-pointer">
+                      {icons.whatappsIcon}
+                    </span>
+                    <span title="Action" onClick={() => window.alert(`Open history for ${lead.name}`)} className="cursor-pointer">
+                      {icons.arrowIcon}
+                    </span>
+                    <span title="View" onClick={() => window.alert(`More options for ${lead.name}`)} className="cursor-pointer">
+                      {icons.boxIcon}
+                    </span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -283,9 +366,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
               </TableRow>
             )}
           </TableBody>
-
         </Table>
-
       </div>
 
       <Pagination className="ml-auto justify-end gap-3 items-center">

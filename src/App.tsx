@@ -4,7 +4,7 @@ import LandingPage from './pages/authPages/LandingPage.tsx'
 import LoginPage from './pages/authPages/LoginPage.tsx'
 import SignupPage from './pages/authPages/SignupPage.tsx'
 import LeadManagement from './pages/mainPages/LeadManagement.tsx'
-import ComingSoon from './components/customUI/ComingSoon.tsx'
+import { ComingSoon } from './components/customUI/ComingSoon.tsx'
 
 const comingSoonRoutes = [
   '/dashboard', '/wellVantageLeads', '/memberManagement',

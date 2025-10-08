@@ -1,9 +1,5 @@
-const ComingSoon = () => {
-  return (
-    <div className="flex justify-center mt-20">
-      Coming Soon...
-    </div>
-  )
-}
+import AdminLayout from "./AdminLayout";
 
-export default ComingSoon
+export const ComingSoonNew = () => <div className="flex justify-center mt-20"> Coming Soon... </div>;
+
+export const ComingSoon = () => <AdminLayout children={ComingSoonNew()} />;

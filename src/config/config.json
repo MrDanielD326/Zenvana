@@ -1,0 +1,30 @@
+{
+  "dropdownOptions": {
+    "primaryTab": ["active", "archieved"],
+    "secondaryTab": ["basic", "preferences", "status"],
+    "secondaryTabValues": {
+      "basicTabs": {
+        "gender": ["Male", "Female", "Non-Binary"],
+        "height": ["cm", "ft"],
+        "weight": ["kg", "lb"]
+      },
+      "preferencesTabs": {
+        "activity": ["Sedentary", "Lightly active", "Moderately active", "Very active"],
+        "goals": ["Lose weight", "Gain weight", "Build muscle", "Modify My Diet", "Manage Stress", "Improve Step Count", "General wellness"],
+        "focus": ["Gym workouts", "Yoga", "Meditation", "Nutrition", "Recovery"],
+        "time": ["Morning", "Afternoon", "Evening", "Late evening"],
+        "intensity": ["Light", "Moderate", "High"],
+        "concerns": ["Diabetes", "Hypertension", "Asthma", "Others (free space)", "None"],
+        "experience": ["Hot", "Warm", "Cold"]
+      },
+      "statusTabs": {
+        "receptionist": ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"],
+        "intereset": ["Hot", "Warm", "Cold"],
+        "status": ["New Inquiry", "Fresh lead", "Contacted once", "Needs Follow-Up", "Contacted but no recent response", "Engaged", "Actively talking or interested", "Signed up"],
+        "packages": ["Gym", "Yoga", "Calisthenics"],
+        "pt": ["Yoga + Calisthenics", "Gym + Calisthenics", "Gym + Yoga"],
+        "info": ["Social Media", "Word of Mouth", "Walk-in", "WellVantage B2C App"]
+      }
+    }
+  }
+}

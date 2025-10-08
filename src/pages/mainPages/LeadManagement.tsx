@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import AdminLayout from '@/components/customUI/AdminLayout'
-import CommingSoon from '@/components/customUI/ComingSoon'
+import { ComingSoonNew } from '@/components/customUI/ComingSoon'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CalendarIcon, ChevronDown, PlusIcon, TrashIcon } from 'lucide-react'
@@ -12,6 +12,8 @@ import { parseDate } from "chrono-node";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from '@/components/ui/calendar'
 import { Textarea } from '@/components/ui/textarea'
+import config from '@/config/config.json';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 const LeadManagement = () => {
   const [showBasicTabs, setShowBasicTabs] = useState(false)
@@ -64,40 +66,23 @@ const LeadManagement = () => {
     setRows(prev => prev.filter(row => row.id !== id));
   };
 
-  const dropdownOptions = {
-    primaryTab: ['active', 'archieved'],
-    secondaryTab: ['basic', 'preferences', 'status'],
-    secondaryTabValues: {
-      basicTabs: {
-        gender: ["Male", "Female", "Non-Binary"],
-        height: ["cm", "ft"],
-        weight: ["kg", "lb"]
-      },
-      preferencesTabs: {
-        activity: ["Sedentary", "Lightly active", "Moderately active", "Very active"],
-        goals: ["Lose weight", "Gain weight", "Build muscle", "Modify My Diet", "Manage Stress", "Improve Step Count", "General wellness"],
-        focus: ["Gym workouts", "Yoga", "Meditation", "Nutrition", "Recovery"],
-        time: ["Morning", "Afternoon", "Evening", "Late evening"],
-        intensity: ["Light", "Moderate", "High"],
-        concerns: ["Diabetes", "Hypertension", "Asthma", "Others (free space)", "None"],
-        experience: ["Hot", "Warm", "Cold"]
-      },
-      statusTabs: {
-        receptionist: ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"],
-        intereset: ["Hot", "Warm", "Cold"],
-        status: ["New Inquiry", "Fresh lead", "Contacted once", "Needs Follow-Up", "Contacted but no recent response", "Engaged", "Actively talking or interested", "Signed up"],
-        package: ["Gym", "Yoga", "Calisthenics"],
-        pt: ["Yoga + Calisthenics", "Gym + Calisthenics", "Gym + Yoga"],
-        info: ["Social Media", "Word of Mouth", "Walk-in", "WellVantage B2C App"]
-      }
-    }
-  };
-
   const updateButton = () => (
     <div className="flex justify-center mt-6">
       <Button size="sm" className="w-full max-w-xs" onClick={handleUpdateClick}> Update </Button>
     </div>
   );
+
+  const {
+    dropdownOptions: {
+      primaryTab, secondaryTab, secondaryTabValues: {
+        basicTabs: { gender, height, weight },
+        preferencesTabs: { activity, goals, focus, time, intensity, concerns, experience },
+        statusTabs: { receptionist, intereset, status, packages, pt, info }
+      }
+    }
+  } = config;
+
+  const commonTabStyle = "px-0 py-2 font-semibold text-foreground bg-transparent border-0 border-b-2 border-transparent rounded-none shadow-none focus:outline-0 focus:ring-0 data-[state=active]:text-green-600 data-[state=active]:border-green-600 data-[state=active]:shadow-none"
 
   return (
     <AdminLayout
@@ -106,37 +91,34 @@ const LeadManagement = () => {
           <div className="flex items-center justify-between w-full">
             <span className="font-semibold text-xl text-gray-600">Lead Management</span>
             {!showBasicTabs && (
-              <Button size="icon" className="rounded-full flex flex-col gap-8" onClick={handleAddClick}> <PlusIcon /> </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" className="rounded-full flex flex-col gap-8" onClick={handleAddClick}> <PlusIcon /> </Button>
+                </TooltipTrigger>
+                <TooltipContent> Click here to add new lead </TooltipContent>
+              </Tooltip>
             )}
           </div>
 
           {!showBasicTabs && (
             <Tabs defaultValue="active">
               <TabsList className="justify-start gap-10 bg-transparent p-0 rounded-none border-b border-gray-300">
-                {(dropdownOptions.primaryTab).map((data) => (
-                  <TabsTrigger
-                    key={data}
-                    value={data}
-                    className="px-0 py-2 font-semibold text-foreground bg-transparent border-0 border-b-2 border-transparent rounded-none shadow-none focus:outline-0 focus:ring-0 data-[state=active]:text-green-600 data-[state=active]:border-green-600 data-[state=active]:shadow-none"
-                  >
+                {primaryTab.map((data) => (
+                  <TabsTrigger key={data} value={data} className={commonTabStyle}>
                     {data.charAt(0).toUpperCase() + data.slice(1)}
                   </TabsTrigger>
                 ))}
               </TabsList>
               <TabsContent value="active"> <DataTableDemo /> </TabsContent>
-              <TabsContent value="archieved"> <CommingSoon /> </TabsContent>
+              <TabsContent value="archieved"> <ComingSoonNew /> </TabsContent>
             </Tabs>
           )}
 
           {showBasicTabs && (
             <Tabs defaultValue="basic">
               <TabsList className="justify-start gap-10 bg-transparent p-0 rounded-none border-b border-gray-300">
-                {(dropdownOptions.secondaryTab).map((data) => (
-                  <TabsTrigger
-                    key={data}
-                    value={data}
-                    className="px-0 py-2 font-semibold text-foreground bg-transparent border-0 border-b-2 border-transparent rounded-none shadow-none focus:outline-0 focus:ring-0 data-[state=active]:text-green-600 data-[state=active]:border-green-600 data-[state=active]:shadow-none"
-                  >
+                {secondaryTab.map((data) => (
+                  <TabsTrigger key={data} value={data} className={commonTabStyle}>
                     {data.charAt(0).toUpperCase() + data.slice(1)}
                   </TabsTrigger>
                 ))}
@@ -171,7 +153,7 @@ const LeadManagement = () => {
                   {/* Third Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Gender {required} </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Gender {required} </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -181,7 +163,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Gender </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.basicTabs.gender).map((data) => (
+                          {gender.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedGender(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -250,7 +232,7 @@ const LeadManagement = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel> Height </DropdownMenuLabel>
-                            {(dropdownOptions.secondaryTabValues.basicTabs.height).map((data) => (
+                            {height.map((data) => (
                               <DropdownMenuItem key={data} onClick={() => setSelectedHeight(data)}> {data} </DropdownMenuItem>
                             ))}
                           </DropdownMenuContent>
@@ -270,7 +252,7 @@ const LeadManagement = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel> Weight </DropdownMenuLabel>
-                            {(dropdownOptions.secondaryTabValues.basicTabs.weight).map((data) => (
+                            {weight.map((data) => (
                               <DropdownMenuItem key={data} onClick={() => setSelectedWeight(data)}> {data} </DropdownMenuItem>
                             ))}
                           </DropdownMenuContent>
@@ -287,7 +269,7 @@ const LeadManagement = () => {
                   {/* First Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Activity Level </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Activity Level </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -297,14 +279,14 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Activity Level </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.activity).map((data) => (
+                          {activity.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedActivity(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Wellness Goals </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Wellness Goals </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -314,7 +296,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Wellness Goals </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.goals).map((data) => (
+                          {goals.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedGoals(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -325,7 +307,7 @@ const LeadManagement = () => {
                   {/* Second Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Primary Fitness Focus </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Primary Fitness Focus </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -335,14 +317,14 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Primary Fitness Focus </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.focus).map((data) => (
+                          {focus.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedFocus(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Preferred Gym Time </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Preferred Gym Time </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -352,7 +334,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Preferred Gym Time </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.time).map((data) => (
+                          {time.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedTime(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -363,7 +345,7 @@ const LeadManagement = () => {
                   {/* Third Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Preferred Workout Intensity </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Preferred Workout Intensity </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -373,14 +355,14 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Preferred Workout Intensity </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.intensity).map((data) => (
+                          {intensity.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedIntensity(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Medical Concerns </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Medical Concerns </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -390,7 +372,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Medical Concerns </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.concerns).map((data) => (
+                          {concerns.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedConcern(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -401,7 +383,7 @@ const LeadManagement = () => {
                   {/* Fourth Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Previous Gym Experience </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Previous Gym Experience </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -411,7 +393,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Previous Gym Experience </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.preferencesTabs.experience).map((data) => (
+                          {experience.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedExperience(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -474,7 +456,7 @@ const LeadManagement = () => {
                       </div>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Assigned To Admin/Receptionist </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Assigned To Admin/Receptionist </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -484,7 +466,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Assigned To Admin/Receptionist </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.statusTabs.receptionist).map((data) => (
+                          {receptionist.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedReceptionist(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -495,7 +477,7 @@ const LeadManagement = () => {
                   {/* Second Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Interest Levels </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Interest Levels </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -505,14 +487,14 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Interest Levels </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.statusTabs.intereset).map((data) => (
+                          {intereset.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedLevel(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Follow Up Status </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Follow Up Status </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -522,7 +504,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Follow Up Status </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.statusTabs.status).map((status) => (
+                          {status.map((status) => (
                             <DropdownMenuItem key={status} onClick={() => setSelectedStatus(status)}> {status} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -533,7 +515,7 @@ const LeadManagement = () => {
                   {/* Third Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Preferred Package </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Preferred Package </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -543,14 +525,14 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Preferred Package </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.statusTabs.package).map((data) => (
+                          {packages.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedPackage(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> Preferred PT Package (If Any) </Label>
+                      <Label htmlFor="text" className="text-gray-500"> Preferred PT Package (If Any) </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -560,7 +542,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Preferred PT Package (If Any) </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.statusTabs.pt).map((concerns) => (
+                          {pt.map((concerns) => (
                             <DropdownMenuItem key={concerns} onClick={() => setSelectedPT(concerns)}> {concerns} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -571,7 +553,7 @@ const LeadManagement = () => {
                   {/* Fourth Row */}
                   <div className="w-full grid grid-cols-2 gap-6">
                     <div className="grid w-full items-center gap-3">
-                      <Label htmlFor="gender" className="text-gray-500"> How They Heard About The Gym </Label>
+                      <Label htmlFor="text" className="text-gray-500"> How They Heard About The Gym </Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" className="font-semibold bg-white text-gray-700 flex justify-between items-center">
@@ -581,7 +563,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> How They Heard About The Gym </DropdownMenuLabel>
-                          {(dropdownOptions.secondaryTabValues.statusTabs.info).map((data) => (
+                          {info.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedInfo(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -591,7 +573,7 @@ const LeadManagement = () => {
                 </div>
 
                 <div className="flex items-center justify-between w-full mb-2">
-                  <Label htmlFor="gender" className="text-gray-500"> Custom notes </Label>
+                  <Label htmlFor="text" className="text-gray-500"> Custom notes </Label>
                   <Button size="sm" className="rounded-full flex flex-col gap-8" onClick={addRow}>
                     <PlusIcon />
                   </Button>
@@ -654,7 +636,7 @@ const LeadManagement = () => {
               </TabsContent>
             </Tabs>
           )}
-        </div>
+        </div >
       }
     />
   )

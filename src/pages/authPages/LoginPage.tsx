@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 const LoginPage = () => {
   const navigate = useNavigate();
   const navSignup = () => navigate("/signup");
+  const navLead = () => navigate("/leadManagement");
 
   const googleIcon = <img src="buttonGoogle.svg" alt="Google Icon" className="w-4 h-4" />;
   const appleIcon = <img src="buttonApple.svg" alt="Apple Icon" className="w-4 h-4" />;
@@ -39,7 +40,7 @@ const LoginPage = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <Button variant="outline"> {googleIcon} Continue with Google </Button>
+        <Button variant="outline" onClick={navLead} className="cursor-pointer"> {googleIcon} Continue with Google </Button>
         <Button variant="outline"> {appleIcon} Continue with Apple </Button>
         <Button variant="link" onClick={navSignup}> Sign-Up </Button>
       </div>

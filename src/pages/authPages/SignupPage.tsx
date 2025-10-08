@@ -18,6 +18,7 @@ const SignupPage = () => {
   const required = <span className="text-red-500">*</span>;
 
   const navLogin = () => navigate("/login");
+  const navLead = () => navigate("/leadManagement");
 
   const formContentStep1 = (
     <div className="flex flex-col gap-8">
@@ -25,7 +26,7 @@ const SignupPage = () => {
         Welcome! Manage, Track and Grow your Gym with Wellvantage.
       </span>
       <div className="flex flex-col gap-4">
-        <Button variant="outline">{googleIcon} Continue with Google</Button>
+        <Button variant="outline" onClick={navLead} className="cursor-pointer">{googleIcon} Continue with Google</Button>
         <Button variant="outline">{appleIcon} Continue with Apple</Button>
         <span className="text-sm font-semibold">OR</span>
         <Button onClick={() => setStep(2)} variant="destructive">Continue</Button>
