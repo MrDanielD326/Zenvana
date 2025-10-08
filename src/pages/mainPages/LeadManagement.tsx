@@ -15,29 +15,50 @@ import { Textarea } from '@/components/ui/textarea'
 import config from '@/config/config.json';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
+const {
+  dropdownOptions: {
+    primaryTab, secondaryTab, secondaryTabValues: {
+      basicTabs: { gender, height, weight },
+      preferencesTabs: { activity, goals, focus, time, intensity, concerns, experience },
+      statusTabs: { receptionist, level, status, packages, pt, info }
+    }
+  }
+} = config;
+
+interface iRows {
+  id: number;
+  text: string;
+  dateInput: string;
+  date?: Date;
+  month?: Date;
+  open: boolean
+}
+
 const LeadManagement = () => {
   const [showBasicTabs, setShowBasicTabs] = useState(false)
   const [selectedGender, setSelectedGender] = useState<string>("")
   const [selectedWeight, setSelectedWeight] = useState<string>("")
   const [selectedHeight, setSelectedHeight] = useState<string>("")
-  const [selectedActivity, setSelectedActivity] = useState<string>("")
-  const [selectedGoals, setSelectedGoals] = useState<string>("")
-  const [selectedFocus, setSelectedFocus] = useState<string>("")
-  const [selectedTime, setSelectedTime] = useState<string>("")
-  const [selectedIntensity, setSelectedIntensity] = useState<string>("")
-  const [selectedConcern, setSelectedConcern] = useState<string>("")
-  const [selectedExperience, setSelectedExperience] = useState<string>("")
-  const [selectedReceptionist, setSelectedReceptionist] = useState<string>("")
-  const [selectedLevel, setSelectedLevel] = useState<string>("")
-  const [selectedStatus, setSelectedStatus] = useState<string>("")
-  const [selectedPackage, setSelectedPackage] = useState<string>("")
-  const [selectedPT, setSelectedPT] = useState<string>("")
-  const [selectedInfo, setSelectedInfo] = useState<string>("")
+  const [selectedActivity, setSelectedActivity] = useState(activity[0])
+  const [selectedGoals, setSelectedGoals] = useState(goals[0])
+  const [selectedFocus, setSelectedFocus] = useState(focus[0])
+  const [selectedTime, setSelectedTime] = useState(activity[0])
+  const [selectedIntensity, setSelectedIntensity] = useState(intensity[0])
+  const [selectedConcern, setSelectedConcern] = useState(concerns[0])
+  const [selectedExperience, setSelectedExperience] = useState(experience[0])
+  const [selectedReceptionist, setSelectedReceptionist] = useState(receptionist[0])
+  const [selectedLevel, setSelectedLevel] = useState(level[0])
+  const [selectedStatus, setSelectedStatus] = useState(status[0])
+  const [selectedPackage, setSelectedPackage] = useState(packages[0])
+  const [selectedPT, setSelectedPT] = useState(pt[0])
+  const [selectedInfo, setSelectedInfo] = useState(info[0])
   const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
-  const [date, setDate] = useState<Date | undefined>(parseDate(value) || undefined)
-  const [month, setMonth] = useState<Date | undefined>(date)
-  const [rows, setRows] = useState<{ id: number; text: string; dateInput: string; date?: Date; month?: Date; open: boolean }[]>([]);
+  const [rows, setRows] = useState<iRows[]>([]);
+
+  const today = new Date();
+  const [value, setValue] = useState(formatDate(today));
+  const [date, setDate] = useState<Date | undefined>(today);
+  const [month, setMonth] = useState<Date | undefined>(today);
 
   const handleAddClick = () => setShowBasicTabs(true)
   const handleUpdateClick = () => setShowBasicTabs(false)
@@ -71,16 +92,6 @@ const LeadManagement = () => {
       <Button size="sm" className="w-full max-w-xs" onClick={handleUpdateClick}> Update </Button>
     </div>
   );
-
-  const {
-    dropdownOptions: {
-      primaryTab, secondaryTab, secondaryTabValues: {
-        basicTabs: { gender, height, weight },
-        preferencesTabs: { activity, goals, focus, time, intensity, concerns, experience },
-        statusTabs: { receptionist, intereset, status, packages, pt, info }
-      }
-    }
-  } = config;
 
   const commonTabStyle = "px-0 py-2 font-semibold text-foreground bg-transparent border-0 border-b-2 border-transparent rounded-none shadow-none focus:outline-0 focus:ring-0 data-[state=active]:text-green-600 data-[state=active]:border-green-600 data-[state=active]:shadow-none"
 
@@ -487,7 +498,7 @@ const LeadManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel> Interest Levels </DropdownMenuLabel>
-                          {intereset.map((data) => (
+                          {level.map((data) => (
                             <DropdownMenuItem key={data} onClick={() => setSelectedLevel(data)}> {data} </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>

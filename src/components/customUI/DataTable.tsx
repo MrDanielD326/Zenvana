@@ -1,5 +1,4 @@
-
-import * as React from "react"
+import { useMemo, useState, type ReactNode } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -21,33 +20,9 @@ type iLead = {
   followUp: string
 }
 
-const defaultLeads: iLead[] = (() => {
-  const names = [
-    "Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta",
-    "Olivia Smith", "Liam Johnson", "Emma Müller", "Noah Dubois", "Sofia Rossi",
-    "Hiroshi Tanaka", "Yuna Kim", "Miguel Alvarez", "Isabella Costa", "Fatima Zahra",
-    "Alexander Ivanov", "Aisha Khan", "Chloe Brown", "Luca Bianchi", "Amara Okafor"
-  ]
-  const assignees = ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"]
-  const interests: iLead["interest"][] = ["Hot", "Warm", "Cold"]
-  const follows = ["New Inquiry", "Need Follow Up", "Engaged", "Converted", "Archived"]
-
-  return names.map((name, i) => ({
-    id: String(i + 1),
-    name,
-    interest: interests[i % interests.length],
-    assignedTo: assignees[i % assignees.length],
-    lastInteraction: `${30 - i} June 2025`,
-    followUp: follows[i % follows.length],
-  }))
-})()
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2">
-      {children}
-    </div>
-  )
+type iDataTable = {
+  data?: iLead[]
+  pageSize?: number
 }
 
 const icons = {
@@ -72,11 +47,40 @@ const icons = {
   boxIcon: <Box />
 }
 
+const defaultLeads: iLead[] = (() => {
+  const names = [
+    "Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta",
+    "Olivia Smith", "Liam Johnson", "Emma Müller", "Noah Dubois", "Sofia Rossi",
+    "Hiroshi Tanaka", "Yuna Kim", "Miguel Alvarez", "Isabella Costa", "Fatima Zahra",
+    "Alexander Ivanov", "Aisha Khan", "Chloe Brown", "Luca Bianchi", "Amara Okafor"
+  ]
+  const assignees = ["Jeo Yadav", "Aman Gupta", "Riya Sen", "Neha Kapoor", "Arjun Mehta"]
+  const interests: iLead["interest"][] = ["Hot", "Warm", "Cold"]
+  const follows = ["New Inquiry", "Need Follow Up", "Engaged", "Converted", "Archived"]
+
+  return names.map((name, i) => ({
+    id: String(i + 1),
+    name,
+    interest: interests[i % interests.length],
+    assignedTo: assignees[i % assignees.length],
+    lastInteraction: `${30 - i} June 2025`,
+    followUp: follows[i % follows.length]
+  }))
+})()
+
+function Chip({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-3 py-2 rounded-lg border text-sm text-gray-700 bg-gray-100 flex items-center gap-2">
+      {children}
+    </div>
+  )
+}
+
 function InterestBadge({ level }: { level: iLead["interest"] }) {
   const map: Record<iLead["interest"], string> = {
-    Hot: "bg-red-100 text-red-700",
-    Warm: "bg-yellow-100 text-yellow-700",
-    Cold: "bg-blue-100 text-blue-700",
+    Hot: "bg-[#FFDBDB] text-red-700",
+    Warm: "bg-[#FFECCD] text-yellow-700",
+    Cold: "bg-[#C9E8FF] text-blue-700"
   }
   const icon = level === "Hot" ? icons.hotIcon : level === "Warm" ? icons.warmIcon : icons.coldIcon
   return (
@@ -104,24 +108,19 @@ function getPageList(current: number, total: number): (number | "...")[] {
   return pages
 }
 
-type iDataTable = {
-  data?: iLead[]
-  pageSize?: number
-}
-
 export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable) {
-  const [search, setSearch] = React.useState("")
-  const [page, setPage] = React.useState(0)
-  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
-  const [interestFilter, setInterestFilter] = React.useState<Set<iLead["interest"]>>(new Set())
-  const [assignedFilter, setAssignedFilter] = React.useState<string | "All">("All")
-  const [sortBy, setSortBy] = React.useState<"createdAt" | "name" | null>(null)
-  const [sortDir, setSortDir] = React.useState<"asc" | "desc">("asc")
-  const [lastAfter, setLastAfter] = React.useState<Date | null>(null)
+  const [search, setSearch] = useState("")
+  const [page, setPage] = useState(0)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [interestFilter, setInterestFilter] = useState<Set<iLead["interest"]>>(new Set())
+  const [assignedFilter, setAssignedFilter] = useState<string | "All">("All")
+  const [sortBy, setSortBy] = useState<"createdAt" | "name" | null>(null)
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
+  const [lastAfter, setLastAfter] = useState<Date | null>(null)
 
   const isMobile = useIsMobile()
 
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     let out = data.filter((l) => l.name.toLowerCase().includes(q)) // <-- only name
     if (interestFilter.size) out = out.filter((l) => interestFilter.has(l.interest))
@@ -169,7 +168,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
             <DropdownMenuTrigger asChild>
               <div>
                 <Chip>
-                  <span className="text-gray-600">Interest Level</span>
+                  <span className="text-gray-600 cursor-pointer">Interest Level</span>
                   <ChevronDown size={16} />
                 </Chip>
               </div>
@@ -211,7 +210,7 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
             <DropdownMenuTrigger asChild>
               <div>
                 <Chip>
-                  <span className="text-gray-600">Assigned to</span>
+                  <span className="text-gray-600 cursor-pointer">Assigned to</span>
                   <ChevronDown size={16} />
                 </Chip>
               </div>
@@ -242,8 +241,8 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
               setSortDir((d) => (d === "asc" ? "desc" : "asc"))
             }}
           >
-            <span className="text-gray-600">Created At</span>
-            <span className="text-gray-400">{sortBy === "createdAt" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
+            <span className="text-gray-600 cursor-pointer">Created At</span>
+            <span className="text-gray-400 cursor-pointer">{sortBy === "createdAt" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
           </button>
         </div>
 
@@ -255,8 +254,8 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
               setSortDir((d) => (d === "asc" ? "desc" : "asc"))
             }}
           >
-            <span className="text-gray-600">Name Alphabetical</span>
-            <span className="text-gray-400">{sortBy === "name" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
+            <span className="text-gray-600 cursor-pointer">Name Alphabetical</span>
+            <span className="text-gray-400 cursor-pointer">{sortBy === "name" ? (sortDir === "asc" ? "↑" : "↓") : "⇵"}</span>
           </button>
         </div>
 
@@ -333,14 +332,14 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar> <AvatarFallback> {lead.name[0]} </AvatarFallback> </Avatar>
-                    <a className="text-blue-600 hover:underline truncate" title={lead.name}>
+                    <a className="text-blue-600 hover:underline truncate cursor-pointer">
                       {lead.name}
                     </a>
                   </div>
                 </TableCell>
                 <TableCell className="text-center"> <InterestBadge level={lead.interest} /> </TableCell>
-                <TableCell className="text-center truncate" title={lead.assignedTo}> {lead.assignedTo} </TableCell>
-                <TableCell className="text-center truncate" title={lead.lastInteraction}> {lead.lastInteraction} </TableCell>
+                <TableCell className="text-center truncate"> {lead.assignedTo} </TableCell>
+                <TableCell className="text-center truncate"> {lead.lastInteraction} </TableCell>
                 <TableCell className="text-center">
                   <Badge
                     className={`text-xs font-medium px-3 py-1 rounded-md ${lead.followUp === "New Inquiry" ? "text-blue-700 bg-[#BFDBFE]" :
@@ -355,15 +354,9 @@ export function DataTableDemo({ data = defaultLeads, pageSize = 10 }: iDataTable
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="inline-flex items-center justify-center gap-3 text-gray-600">
-                    <span title="WhatsApp" onClick={() => window.alert(`Open WhatsApp for ${lead.name}`)} className="cursor-pointer">
-                      {icons.whatappsIcon}
-                    </span>
-                    <span title="Action" onClick={() => window.alert(`Open history for ${lead.name}`)} className="cursor-pointer">
-                      {icons.arrowIcon}
-                    </span>
-                    <span title="View" onClick={() => window.alert(`More options for ${lead.name}`)} className="cursor-pointer">
-                      {icons.boxIcon}
-                    </span>
+                    <span className="cursor-pointer"> {icons.whatappsIcon} </span>
+                    <span className="cursor-pointer"> {icons.arrowIcon} </span>
+                    <span className="cursor-pointer"> {icons.boxIcon} </span>
                   </div>
                 </TableCell>
               </TableRow>
